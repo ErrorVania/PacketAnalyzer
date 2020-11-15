@@ -6,14 +6,14 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <iostream>
-
+#include <sstream>
 #include <string>
-
+#include <iomanip>
 
 
 #define ERROR_STREAM std::cerr
 #define glsl_version "#version 130"
-
+#pragma region setups
 void setupGLFW(GLFWerrorfun callback = nullptr, int swapinterval = 1) {
 	if (glfwInit() == GLFW_FALSE) {
 		ERROR_STREAM << "Failed GLFW Init" << std::endl;
@@ -54,7 +54,7 @@ void imguiEnd() {
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 }
-
+#pragma endregion
 
 
 void doStuff(GLFWwindow* window) {
@@ -65,8 +65,10 @@ void doStuff(GLFWwindow* window) {
 
     pcapreader.open("C:\\Users\\Joshua\\Desktop\\test.pcap");
     pcapreader.beginRead(&pdus);
+    const pcap::pcap_global_hdr* global_hdr = pcapreader.getGHDR();
 
     bool showtest = false;
+    bool pcap_global_info = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     ImVec2 siztest = ImVec2(400, 400);
 
@@ -79,36 +81,74 @@ void doStuff(GLFWwindow* window) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+
+        ImGui::ShowDemoWindow();
+
+
         {
             static float f = 0.0f;
             static int counter = 0;
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+            ImGui::Begin("Info");                          // Create a window called "Hello, world!" and append into it.
             ImGui::Checkbox("Test Window", &showtest);
-
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
         }
+
 
         if (showtest) {
             ImGui::Begin("Test Window", &showtest);
             ImGui::Text("Hello");
             ImGui::SetWindowSize(siztest);
+            if (ImGui::CollapsingHeader("Test")) {
 
-            for (int i = 0; i < pdus.size(); i++) {
-                std::string a = std::to_string(pdus[i].pkhdr->incl_len);
-                ImGui::Text(a.c_str());
+                for (int i = 0; i < pdus.size(); i++) {
+                    ImGui::Text(std::to_string(pdus[i].pkhdr->incl_len).c_str());
+                }
+            }
+            ImGui::End();
+        }
+
+
+        if (pcap_global_info) {
+            ImGui::Begin("Pcap Info");
+            ImGui::SetWindowSize(siztest);
+
+            ImGui::Text("Pcap Version:");
+            ImGui::SameLine();
+            ImGui::Text("%s.%s", std::to_string(global_hdr->version_major).c_str(), std::to_string(global_hdr->version_minor).c_str());
+
+
+            {
+                std::stringstream stream;
+                stream << std::hex << global_hdr->magic;
+                std::string result(stream.str());
+                for (int x = 0; x < result.size(); x++) result[x] = std::toupper(result[x]);
+                ImGui::Text("Magic Number: 0x%s", result.c_str());
             }
 
+
+            ImGui::Text("Network: %d", global_hdr->network);
+            ImGui::Text("Captures: %d", pdus.size());
 
 
             ImGui::End();
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // Rendering
         ImGui::Render();
