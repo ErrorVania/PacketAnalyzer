@@ -46,6 +46,7 @@ public:
         size = 0;
     }
     void beginRead(std::vector<PDU>* a) {
+        a->clear();
         unsigned long offset = sizeof(pcap::pcap_global_hdr);
         pcap::pcap_pak_hdr* pcaphdr = nullptr;
         unsigned int i = 0;

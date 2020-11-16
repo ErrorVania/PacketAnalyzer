@@ -9,7 +9,7 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
-
+//#include "pcapreader/protocols.h"
 
 #define ERROR_STREAM std::cerr
 #define glsl_version "#version 130"
@@ -63,12 +63,19 @@ void doStuff(GLFWwindow* window) {
     std::vector<PDU> pdus;
     PcapReader pcapreader;
 
-    pcapreader.open("C:\\Users\\Joshua\\Desktop\\test.pcap");
-    pcapreader.beginRead(&pdus);
-    const pcap::pcap_global_hdr* global_hdr = pcapreader.getGHDR();
+    //pcapreader.open("C:\\Users\\Joshua\\Desktop\\test.pcap");
+    //pcapreader.beginRead(&pdus);
+    const pcap::pcap_global_hdr* global_hdr = nullptr;
 
     bool showtest = false;
     bool pcap_global_info = true;
+    bool pcapLoaded = false;
+    bool startWindow = true;
+
+    char buffer[MAX_PATH];
+    memset(buffer, 0, MAX_PATH);
+    strcpy_s(buffer, "C:\\Users\\Joshua\\Desktop\\test.pcap");
+
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     ImVec2 siztest = ImVec2(400, 400);
 
@@ -85,33 +92,60 @@ void doStuff(GLFWwindow* window) {
         ImGui::ShowDemoWindow();
 
 
-        {
-            static float f = 0.0f;
-            static int counter = 0;
+        if (startWindow) {
+            
+            ImGui::Begin("Open Pcap",0,ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::InputText("File Path", buffer, MAX_PATH);
+            ImGui::SameLine();
+            if (ImGui::Button("Open")) {
+                pcapreader.open(buffer);
+                global_hdr = pcapreader.getGHDR();
+                pcapreader.beginRead(&pdus);
+                pcapLoaded = true;
+            
+            }
 
-            ImGui::Begin("Info");                          // Create a window called "Hello, world!" and append into it.
-            ImGui::Checkbox("Test Window", &showtest);
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            if (pcapLoaded) {
+                ImGui::Checkbox("Show Global Pcap Info", &pcap_global_info);
+                ImGui::Checkbox("Show Pcap Info", &showtest);
+            }
+
+
+
             ImGui::End();
         }
 
 
-        if (showtest) {
+
+
+        if (pcapLoaded && showtest) {
             ImGui::Begin("Test Window", &showtest);
             ImGui::Text("Hello");
             ImGui::SetWindowSize(siztest);
             if (ImGui::CollapsingHeader("Test")) {
-
-                for (int i = 0; i < pdus.size(); i++) {
-                    ImGui::Text(std::to_string(pdus[i].pkhdr->incl_len).c_str());
+                ImGui::Columns(6, "mycolumn", true);
+                ImGui::Separator();
+                
+                for (int i = 0; i < 6; i++) {
+                    for (int x = 0; x < 3; x++) {
+                        ImGui::Text("AAA");
+                    }
+                    ImGui::NextColumn();
+                    ImGui::Separator();
                 }
+
+
+
+                //for (int i = 0; i < pdus.size(); i++) ImGui::Text(std::to_string(pdus[i].pkhdr->incl_len).c_str());
+
+
             }
             ImGui::End();
         }
 
 
-        if (pcap_global_info) {
-            ImGui::Begin("Pcap Info");
+        if (pcapLoaded && pcap_global_info) {
+            ImGui::Begin("Global Pcap Header",&pcap_global_info,ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
             ImGui::SetWindowSize(siztest);
 
             ImGui::Text("Pcap Version:");

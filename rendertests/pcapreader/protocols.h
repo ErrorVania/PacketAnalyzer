@@ -1,18 +1,19 @@
 #pragma once
-/*#include <iostream>
+#include <iostream>
 #include "structs.h"
 #include <bitset>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-#include <net/ethernet.h>
+#include <WinSock2.h>
+#include <ip2string.h>
+#include <WS2tcpip.h>
 
+typedef unsigned uint;
 
 char* tomac(void* mac) {
-    ether_addr ea;
+    /*ether_addr ea;
     memcpy(ea.octet,mac,6);
-    return ether_ntoa(&ea);
+    return ether_ntoa(&ea);*/
+    char a[0xff];
+    return RtlEthernetAddressToStringA((DL_EUI48*)mac,a);
 }
 char* toip(const uint32_t* ip) {
     in_addr i;
@@ -20,7 +21,7 @@ char* toip(const uint32_t* ip) {
     return inet_ntoa(i);
 }
 const char* toip6(const in6_addr* ip, char* buf) {
-    inet_ntop(AF_INET6,&ip->__u6_addr,buf,INET6_ADDRSTRLEN);
+    inet_ntop(AF_INET6,&ip->u,buf,INET6_ADDRSTRLEN);
     return buf;
 }
 
@@ -153,4 +154,4 @@ namespace protocols {
     
     
     }
-}*/
+}
