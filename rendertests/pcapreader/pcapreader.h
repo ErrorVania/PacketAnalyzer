@@ -4,6 +4,8 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include "protocols.h"
+
 namespace pcap {
     struct pcap_global_hdr {
         uint32_t magic;
@@ -56,7 +58,11 @@ public:
             offset += pcaphdr->incl_len + sizeof(pcap::pcap_pak_hdr);
 
             p.payload = data + offset + sizeof(pcap::pcap_pak_hdr);
+            
+
             p.pkhdr = pcaphdr;
+            protocols::EtherII(p.payload,pcaphdr->incl_len);
+            
             a->push_back(p);
             i++;
         }

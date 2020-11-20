@@ -63,7 +63,7 @@
     <ClInclude Include="pcapreader\structs.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="imgui_oop.h">
+    <ClInclude Include="main_loop.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

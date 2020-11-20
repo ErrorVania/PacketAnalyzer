@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <ws2ipdef.h>
+#include <WS2tcpip.h>
 
 struct eth_hdr
 {
@@ -42,7 +42,7 @@ struct ip_hdr {
 	uint16_t flag_frag;
 	uint8_t ttl, proto;
 	uint16_t header_chksum;
-	uint32_t src, dst;
+	in_addr src, dst;
 };
 struct ip6_hdr {
     uint32_t version : 4,
@@ -52,7 +52,7 @@ struct ip6_hdr {
     uint16_t length;
     uint8_t next_header;
     uint8_t ttl;
-    sockaddr_in6 src, dst;
+    in6_addr src, dst;
 };
 
 

@@ -14,32 +14,6 @@
 #define ERROR_STREAM std::cerr
 #define glsl_version "#version 130"
 #pragma region setups
-void setupGLFW(GLFWerrorfun callback = nullptr, int swapinterval = 1) {
-	if (glfwInit() == GLFW_FALSE) {
-		ERROR_STREAM << "Failed GLFW Init" << std::endl;
-		exit(1);
-	}
-	std::cout << "GLFW Init success" << std::endl;
-
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-	glfwSwapInterval(swapinterval); // Enable vsync
-	if (callback) glfwSetErrorCallback(callback);
-}
-void setupGL3W() {
-	if (gl3wInit() != 0)
-	{
-		ERROR_STREAM << "Failed to initialize OpenGL loader!" << std::endl;
-		exit(2);
-	}
-	std::cout << "GL3W Init success" << std::endl;
-}
-void glfwEnd(GLFWwindow* window) {
-	glfwDestroyWindow(window);
-	glfwTerminate();
-}
 
 void imguiStart(GLFWwindow* window) {
 	IMGUI_CHECKVERSION();
