@@ -78,7 +78,7 @@ namespace protocols {
         switch (iphdr->proto) {
             case IPPROTO_UDP:
                 std::cout << "|";
-                UDP(buf + iphdr->ihl*4);
+                UDP(buf + iphdr->ihl*4,calcdsize);
                 break;
             case IPPROTO_TCP:
                 std::cout << "|";
@@ -102,7 +102,7 @@ namespace protocols {
         switch (iphdr->next_header) {
             case IPPROTO_UDP:
                 std::cout << "|";
-                UDP(buf + sizeof(ip6_hdr));
+                UDP(buf + sizeof(ip6_hdr), calcdsize);
                 break;
             case IPPROTO_TCP:
                 std::cout << "|";

@@ -37,8 +37,6 @@ void doStuff(GLFWwindow* window) {
     std::vector<PDU> pdus;
     PcapReader pcapreader;
 
-    //pcapreader.open("C:\\Users\\Joshua\\Desktop\\test.pcap");
-    //pcapreader.beginRead(&pdus);
     const pcap::pcap_global_hdr* global_hdr = nullptr;
 
     bool showtest = false;
@@ -120,11 +118,9 @@ void doStuff(GLFWwindow* window) {
 
         if (pcapLoaded && pcap_global_info) {
             ImGui::Begin("Global Pcap Header",&pcap_global_info,ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
-            ImGui::SetWindowSize(siztest);
-
-            ImGui::Text("Pcap Version:");
-            ImGui::SameLine();
-            ImGui::Text("%s.%s", std::to_string(global_hdr->version_major).c_str(), std::to_string(global_hdr->version_minor).c_str());
+            //ImGui::SetWindowSize(siztest);
+            
+            ImGui::Text("Pcap Version: %s.%s", std::to_string(global_hdr->version_major).c_str(), std::to_string(global_hdr->version_minor).c_str());
 
 
             {

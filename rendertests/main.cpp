@@ -21,9 +21,9 @@ static void glfw_error_callback(int error, const char* description)
 
 
 
-
 int main(int, char**)
 {
+    
     glfwSetErrorCallback(glfw_error_callback);
     if (glfwInit() == GLFW_FALSE) {
         ERROR_STREAM << "Failed GLFW Init" << std::endl;
