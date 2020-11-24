@@ -9,7 +9,7 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
-//#include "pcapreader/protocols.h"
+#include <Windows.h>
 
 #define ERROR_STREAM std::cerr
 #define glsl_version "#version 130"
@@ -31,6 +31,39 @@ void imguiEnd() {
 #pragma endregion
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void doStuff(GLFWwindow* window) {
 
 
@@ -42,7 +75,11 @@ void doStuff(GLFWwindow* window) {
     bool showtest = false;
     bool pcap_global_info = true;
     bool pcapLoaded = false;
-    bool startWindow = true;
+    bool openPcapDialouge = true;
+    bool showfiledialouge = false;
+
+
+    bool* bools = nullptr;
 
     char buffer[MAX_PATH];
     memset(buffer, 0, MAX_PATH);
@@ -64,16 +101,26 @@ void doStuff(GLFWwindow* window) {
         ImGui::ShowDemoWindow();
 
 
-        if (startWindow) {
+        if (openPcapDialouge) {
             
-            ImGui::Begin("Open Pcap",0,ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::Begin("Open Pcap",&openPcapDialouge,ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
             ImGui::InputText("File Path", buffer, MAX_PATH);
             ImGui::SameLine();
             if (ImGui::Button("Open")) {
-                pcapreader.open(buffer);
-                global_hdr = pcapreader.getGHDR();
-                pcapreader.beginRead(&pdus);
-                pcapLoaded = true;
+                struct stat s;
+                stat(buffer, &s);
+                if (s.st_mode & S_IFDIR) {
+                    showfiledialouge = true;
+                    pcap_global_info = false;
+                    pcapLoaded = false;
+                }
+                else if (s.st_mode & S_IFREG) {
+                    showfiledialouge = false;
+                    pcapreader.open(buffer);
+                    global_hdr = pcapreader.getGHDR();
+                    pcapreader.beginRead(&pdus);
+                    pcapLoaded = true;
+                }
             
             }
 
@@ -87,7 +134,39 @@ void doStuff(GLFWwindow* window) {
             ImGui::End();
         }
 
+        if (showfiledialouge) {
+            std::vector<std::string> pcaps;
+            WIN32_FIND_DATAA data;
+            std::string a(buffer);
+            if (a.back() == '\\') a += "*.pcap"; else a += "\\*.pcap";
+            
+            
 
+            
+            HANDLE h = FindFirstFileA(a.c_str(), &data);
+            if (h != INVALID_HANDLE_VALUE) {
+                do {
+                    pcaps.push_back(data.cFileName);
+                } while (FindNextFileA(h, &data) != 0);
+                FindClose(h);
+            }
+
+            ImGui::Begin("Choose Pcap", &showfiledialouge, ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar);
+            ImGui::SetWindowSize(ImVec2(400, 200));
+            if (bools == nullptr) bools = (bool*)malloc(pcaps.size()); else bools = (bool*)realloc(bools, pcaps.size());
+            memset(bools, 0, pcaps.size());
+
+            for (int i = 0; i < pcaps.size(); i++) {
+                ImGui::Selectable(pcaps[i].c_str(), bools + i);
+                if (*(bools + i)) {
+                    std::string b(buffer);
+                    if (b.back() == '\\') b += pcaps[i]; else b = b + '\\' + pcaps[i];
+                    strcpy_s(buffer, b.c_str());
+                    showfiledialouge = false;
+                }
+            }
+            ImGui::End();
+        }
 
 
         if (pcapLoaded && showtest) {
@@ -105,12 +184,6 @@ void doStuff(GLFWwindow* window) {
                     ImGui::NextColumn();
                     ImGui::Separator();
                 }
-
-
-
-                //for (int i = 0; i < pdus.size(); i++) ImGui::Text(std::to_string(pdus[i].pkhdr->incl_len).c_str());
-
-
             }
             ImGui::End();
         }
@@ -118,11 +191,9 @@ void doStuff(GLFWwindow* window) {
 
         if (pcapLoaded && pcap_global_info) {
             ImGui::Begin("Global Pcap Header",&pcap_global_info,ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
-            //ImGui::SetWindowSize(siztest);
-            
             ImGui::Text("Pcap Version: %s.%s", std::to_string(global_hdr->version_major).c_str(), std::to_string(global_hdr->version_minor).c_str());
 
-
+            
             {
                 std::stringstream stream;
                 stream << std::hex << global_hdr->magic;
@@ -138,19 +209,6 @@ void doStuff(GLFWwindow* window) {
 
             ImGui::End();
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

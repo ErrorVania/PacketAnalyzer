@@ -11,14 +11,13 @@
 #define INET6_ADDRSTRLEN 46
 #define INET4_ADDRSTRLEN 16
 
-typedef unsigned uint;
 
 std::string tomac(uint8_t* mac) {
     std::ios_base::fmtflags f(std::cout.flags());
 
     std::stringstream b;
     for (int i = 0; i < 6; i++) {
-        b << std::hex << (uint)*(mac + i);
+        b << std::hex << (unsigned)*(mac + i);
         if (i <= 5) b << ":";
     }
     std::cout.flags(f);
@@ -47,14 +46,14 @@ namespace protocols {
     }
     void TCP(uint8_t* buf, const ip_hdr* iphdr) {
         tcp_hdr* tcphdr = (tcp_hdr*)buf;
-        uint hdrlen = (tcphdr->data_offset >> 4)*4;
+        unsigned hdrlen = (tcphdr->data_offset >> 4)*4;
         std::bitset<8> fl(tcphdr->flags);
         std::cout << "(TCP: Port " << ntohs(tcphdr->src_port) << " > " << ntohs(tcphdr->dst_port) << " Header Length: " << hdrlen << ", Flags:[" << fl << "], Payload: " << (ntohs(iphdr->total_len) - iphdr->ihl*4 - hdrlen) << " bytes)";
 
     }
     void TCP(uint8_t* buf, const ip6_hdr* iphdr) {
         tcp_hdr* tcphdr = (tcp_hdr*)buf;
-        uint hdrlen = (tcphdr->data_offset >> 4)*4;
+        unsigned hdrlen = (tcphdr->data_offset >> 4)*4;
         std::bitset<8> fl(tcphdr->flags);
         std::cout << "(TCP: Port " << ntohs(tcphdr->src_port) << " > " << ntohs(tcphdr->dst_port) << ", Flags:[" << fl << "], Payload: " << (ntohs(iphdr->length) - hdrlen) << " bytes)";
 
