@@ -1,5 +1,5 @@
 #pragma once
-#include "pcapreader/pcapreader.h"
+#include "pcapreader.h"
 
 struct readerstruct {
     int pduid;
