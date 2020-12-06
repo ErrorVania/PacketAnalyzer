@@ -213,10 +213,11 @@ void doStuff(GLFWwindow* window) {
 
             ImGui::SetWindowSize(ImVec2(700, 400));
             
-            if (ImGui::BeginTable("TestTable", 3,ImGuiTableFlags_::ImGuiTableFlags_Borders | ImGuiTableFlags_::ImGuiTableFlags_Resizable)) {
+            if (ImGui::BeginTable("TestTable", 4,ImGuiTableFlags_::ImGuiTableFlags_Borders | ImGuiTableFlags_::ImGuiTableFlags_Resizable)) {
                 ImGui::TableSetupColumn("Nr. ");
                 ImGui::TableSetupColumn("Source");
                 ImGui::TableSetupColumn("Destination");
+                ImGui::TableSetupColumn("Length");
                 ImGui::TableHeadersRow();
                 for (int i = 0; i < pdus.size(); i++) {
                     ImGui::TableNextColumn();
@@ -224,7 +225,9 @@ void doStuff(GLFWwindow* window) {
                     ImGui::TableNextColumn();
                     ImGui::Text("%s", getSource(pdus[i]).c_str());
                     ImGui::TableNextColumn();
-                    ImGui::Text("%s", getDest(pdus[i]).c_str());
+                    ImGui::Text("%s", getDest(pdus[i]).c_str()); 
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%d", pdus[i]->incl_len);
                     ImGui::TableNextRow();
                 }
                 ImGui::EndTable();
