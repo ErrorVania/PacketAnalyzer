@@ -1,4 +1,4 @@
-#pragma once
+#ifdef xxx
 #include <iostream>
 #include <ios>
 #include <bitset>
@@ -8,8 +8,7 @@
 #include <WS2tcpip.h>
 #include <string>
 
-#define INET6_ADDRSTRLEN 46
-#define INET4_ADDRSTRLEN 16
+
 
 
 std::string tomac(uint8_t* mac) {
@@ -25,8 +24,8 @@ std::string tomac(uint8_t* mac) {
     
 }
 std::string toip(const in_addr* ip) {
-    char str[INET4_ADDRSTRLEN];
-    inet_ntop(AF_INET, ip, str, INET4_ADDRSTRLEN);
+    char str[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, ip, str, INET_ADDRSTRLEN);
     return std::string(str);
 }
 
@@ -174,3 +173,4 @@ namespace protocols {
     
     }
 }
+#endif

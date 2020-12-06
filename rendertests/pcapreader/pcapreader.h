@@ -21,12 +21,9 @@ namespace pcap {
         uint32_t ts_usec;
         uint32_t incl_len;
         uint32_t orig_len;
+        uint8_t pdu[];
     };
 }
-struct PDU {
-    pcap::pcap_pak_hdr* pkhdr;
-    uint8_t* payload;
-};
 
 
 
@@ -36,18 +33,18 @@ private:
     uint8_t* data;
     unsigned long size;
     pcap::pcap_global_hdr* ghdr;
-    PDU p;
+    //PDU p;
 
 
 public:
     PcapReader() {
         data = nullptr;
-        p.payload = nullptr;
-        p.pkhdr = nullptr;
+        //p.payload = nullptr;
+        //p.pkhdr = nullptr;
         ghdr = nullptr;
         size = 0;
     }
-    void beginRead(std::vector<PDU>* a) {
+    void beginRead(std::vector<pcap::pcap_pak_hdr*>* a) {
         a->clear();
         unsigned long offset = sizeof(pcap::pcap_global_hdr);
         pcap::pcap_pak_hdr* pcaphdr = nullptr;
@@ -57,13 +54,13 @@ public:
 
             offset += pcaphdr->incl_len + sizeof(pcap::pcap_pak_hdr);
 
-            p.payload = data + offset + sizeof(pcap::pcap_pak_hdr);
+            //p.payload = data + offset + sizeof(pcap::pcap_pak_hdr);
             
 
-            p.pkhdr = pcaphdr;
-            protocols::EtherII(p.payload,pcaphdr->incl_len);
+            //p.pkhdr = pcaphdr;
+            //protocols::EtherII(p.payload,pcaphdr->incl_len);
             
-            a->push_back(p);
+            a->push_back(pcaphdr);
             i++;
         }
         std::cout << "Read " << i << " PDUs" << std::endl;

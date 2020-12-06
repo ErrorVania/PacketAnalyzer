@@ -159,8 +159,9 @@
     <ClInclude Include="include\GL\glcorearb.h" />
     <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="pcapreader\pcapreader.h" />
-    <ClInclude Include="pcapreader\protocols.h" />
+    <ClInclude Include="pcapreader\reader_struct.h" />
     <ClInclude Include="pcapreader\structs.h" />
+    <ClInclude Include="extractPDUinfo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gl3w.c" />
@@ -169,6 +170,7 @@
     <ClCompile Include="include\imgui\imgui_draw.cpp" />
     <ClCompile Include="include\imgui\imgui_impl_glfw.cpp" />
     <ClCompile Include="include\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="include\imgui\imgui_tables.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
