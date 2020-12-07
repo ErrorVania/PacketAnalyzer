@@ -217,6 +217,7 @@ void doStuff(GLFWwindow* window) {
                 ImGui::TableSetupColumn("Nr. ");
                 ImGui::TableSetupColumn("Source");
                 ImGui::TableSetupColumn("Destination");
+		ImGui::TableSetupColumn("Protocol");
                 ImGui::TableSetupColumn("Length");
                 ImGui::TableHeadersRow();
                 for (int i = 0; i < pdus.size(); i++) {
@@ -226,6 +227,8 @@ void doStuff(GLFWwindow* window) {
                     ImGui::Text("%s", getSource(pdus[i]).c_str());
                     ImGui::TableNextColumn();
                     ImGui::Text("%s", getDest(pdus[i]).c_str()); 
+		    ImGui::TableNextColumn();
+		    ImGui::Text("%s",lastProtoL2(pdus[i]).c_str());
                     ImGui::TableNextColumn();
                     ImGui::Text("%d", pdus[i]->incl_len);
                     ImGui::TableNextRow();
