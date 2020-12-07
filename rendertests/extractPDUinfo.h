@@ -93,7 +93,7 @@ std::string lastProtoL2(const pcap::pcap_pak_hdr* pcaphdr) {
     
     const uint8_t* pcap_payload = pcaphdr->pdu;
     eth_hdr* ethernet_header = (eth_hdr*)payload;
-    auto ethtype = ntohs(ethernet_header->ethertype)
+    auto ethtype = ntohs(ethernet_header->ethertype);
     switch (ethtype) { //Layer 2
         case 0x0800: //IPv4
             proto = "IPv4";
