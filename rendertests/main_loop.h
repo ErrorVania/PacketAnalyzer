@@ -213,7 +213,7 @@ void doStuff(GLFWwindow* window) {
 
             ImGui::SetWindowSize(ImVec2(700, 400));
             
-            if (ImGui::BeginTable("TestTable", 4,ImGuiTableFlags_::ImGuiTableFlags_Borders | ImGuiTableFlags_::ImGuiTableFlags_Resizable)) {
+            if (ImGui::BeginTable("TestTable", 5,ImGuiTableFlags_::ImGuiTableFlags_Borders | ImGuiTableFlags_::ImGuiTableFlags_Resizable)) {
                 ImGui::TableSetupColumn("Nr. ");
                 ImGui::TableSetupColumn("Source");
                 ImGui::TableSetupColumn("Destination");
