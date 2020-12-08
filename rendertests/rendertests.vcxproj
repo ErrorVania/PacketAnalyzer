@@ -144,6 +144,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\imgui\imfilebrowser.h" />
     <ClInclude Include="main_loop.h" />
     <ClInclude Include="include\imgui\imconfig.h" />
     <ClInclude Include="include\imgui\imgui.h" />
@@ -162,6 +163,7 @@
     <ClInclude Include="pcapreader\reader_struct.h" />
     <ClInclude Include="pcapreader\structs.h" />
     <ClInclude Include="extractPDUinfo.h" />
+    <ClInclude Include="protoResolv.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gl3w.c" />

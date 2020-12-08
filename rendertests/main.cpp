@@ -26,7 +26,7 @@ int main(int, char**)
     
     glfwSetErrorCallback(glfw_error_callback);
     if (glfwInit() == GLFW_FALSE) {
-        ERROR_STREAM << "Failed GLFW Init" << std::endl;
+        std::cerr << "Failed GLFW Init" << std::endl;
         exit(1);
     }
     std::cout << "GLFW Init success" << std::endl;
@@ -45,19 +45,26 @@ int main(int, char**)
 
     if (gl3wInit() != 0)
     {
-        ERROR_STREAM << "Failed to initialize OpenGL loader!" << std::endl;
+        std::cerr << "Failed to initialize OpenGL loader!" << std::endl;
         exit(2);
     }
     std::cout << "GL3W Init success" << std::endl;
 
 
 
-    imguiStart(window);
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 130");
 
 
     doStuff(window);
 
-    imguiEnd();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     glfwDestroyWindow(window);
     glfwTerminate();

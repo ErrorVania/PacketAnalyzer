@@ -1,82 +1,29 @@
 #pragma once
 
-#include <GL/gl3w.h>
-#include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <iomanip>
-#include "extractPDUinfo.h"
 #include <Windows.h>
-
-#define ERROR_STREAM std::cerr
-#define glsl_version "#version 130"
-#pragma region setups
-
-void imguiStart(GLFWwindow* window) {
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(glsl_version);
-}
-void imguiEnd() {
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-}
-#pragma endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#include "extractPDUinfo.h"
+#include <imgui/imfilebrowser.h>
 
 inline bool endswith(std::string const& value, std::string const& ending)
 {
     if (ending.size() > value.size()) return false;
     return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
-
 }
 
-
-
-
-
-
-
-
-
-
 void doStuff(GLFWwindow* window) {
+    ImGui::FileBrowser fb;
+    fb.SetTitle("Select a PCAP");
+    fb.SetTypeFilters({ ".pcap" });
 
-
-    std::vector<pcap::pcap_pak_hdr*> pdus;
+    std::vector<pcap_pak_hdr*> pdus;
     PcapReader pcapreader;
 
-    const pcap::pcap_global_hdr* global_hdr = nullptr;
+    const pcap_global_hdr* global_hdr = nullptr;
 
     bool showtest = false;
     bool pcap_global_info = true;
@@ -105,10 +52,11 @@ void doStuff(GLFWwindow* window) {
 
         ImGui::ShowDemoWindow();
 
-
+        ImGui::PushItemWidth(300);
         if (openPcapDialouge) {
-            
+           
             ImGui::Begin("Open Pcap",&openPcapDialouge,ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::InputText("File Path", buffer, MAX_PATH);
             ImGui::SameLine();
             if (ImGui::Button("Open") || btnPressAuto) {
@@ -128,55 +76,25 @@ void doStuff(GLFWwindow* window) {
                 }
                 btnPressAuto = false;
             }
+            ImGui::SameLine();
+            if (ImGui::Button("...")) {
+                fb.Open();
+            }
+
+            fb.Display();
+            if (fb.HasSelected()) {
+                strcpy_s(buffer, fb.GetSelected().string().c_str());
+                btnPressAuto = true;
+            }
+
+
 
             if (pcapLoaded) {
                 ImGui::Checkbox("Show Global Pcap Info", &pcap_global_info);
                 ImGui::Checkbox("Show Pcap Info", &showtest);
             }
-
-
-
             ImGui::End();
         }
-
-        if (showfiledialouge) {
-            std::vector<std::string> pcaps;
-            WIN32_FIND_DATAA data;
-            std::string a(buffer);
-            if (a.back() == '\\') a += "*"; else a += "\\*";
-
-            
-            HANDLE h = FindFirstFileA(a.c_str(), &data);
-            if (h != INVALID_HANDLE_VALUE) {
-                do {
-                    if (endswith(data.cFileName, ".pcap")) {
-                        pcaps.push_back(data.cFileName);
-                    }
-                } while (FindNextFileA(h, &data) != 0);
-                FindClose(h);
-            }
-
-            ImGui::Begin(buffer, &showfiledialouge, ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar);
-            ImGui::SetWindowSize(ImVec2(400, 200));
-            if (bools == nullptr) bools = (bool*)malloc(pcaps.size()); else bools = (bool*)realloc(bools, pcaps.size());
-            memset(bools, 0, pcaps.size());
-
-
-
-
-            for (int i = 0; i < pcaps.size(); i++) {
-                ImGui::Selectable(pcaps[i].c_str(), bools + i);
-                if (*(bools + i)) {
-                    std::string b(buffer);
-                    if (b.back() == '\\') b += pcaps[i]; else b = b + '\\' + pcaps[i];
-                    strcpy_s(buffer, b.c_str());
-                    showfiledialouge = false;
-                    btnPressAuto = true;
-                }
-            }
-            ImGui::End();
-        }
-
 
 
 
@@ -195,7 +113,7 @@ void doStuff(GLFWwindow* window) {
                 std::stringstream stream;
                 stream << std::hex << global_hdr->magic;
                 std::string result(stream.str());
-                for (int x = 0; x < result.size(); x++) result[x] = std::toupper(result[x]);
+                for (unsigned x = 0; x < result.size(); x++) result[x] = std::toupper(result[x]);
                 ImGui::Text("Magic Number: 0x%s", result.c_str());
             }
 
@@ -217,29 +135,28 @@ void doStuff(GLFWwindow* window) {
                 ImGui::TableSetupColumn("Nr. ");
                 ImGui::TableSetupColumn("Source");
                 ImGui::TableSetupColumn("Destination");
-		ImGui::TableSetupColumn("Protocol");
+		        ImGui::TableSetupColumn("Protocol");
                 ImGui::TableSetupColumn("Length");
+                
+                
+                
+                
                 ImGui::TableHeadersRow();
-                for (int i = 0; i < pdus.size(); i++) {
+                for (unsigned i = 0; i < pdus.size(); i++) {
                     ImGui::TableNextColumn();
                     ImGui::Text("%d", i);
                     ImGui::TableNextColumn();
                     ImGui::Text("%s", getSource(pdus[i]).c_str());
                     ImGui::TableNextColumn();
                     ImGui::Text("%s", getDest(pdus[i]).c_str()); 
-		    ImGui::TableNextColumn();
-		    ImGui::Text("%s",lastProtoL2(pdus[i]).c_str());
+		            ImGui::TableNextColumn();
+		            ImGui::Text("%s",lastProtoL2(pdus[i]).c_str());
                     ImGui::TableNextColumn();
                     ImGui::Text("%d", pdus[i]->incl_len);
                     ImGui::TableNextRow();
                 }
                 ImGui::EndTable();
             }
-
-
-
-            
-
             ImGui::End();
         }
 
