@@ -52,12 +52,11 @@ void doStuff(GLFWwindow* window) {
 
         ImGui::ShowDemoWindow();
 
-        ImGui::PushItemWidth(300);
         if (openPcapDialouge) {
            
             ImGui::Begin("Open Pcap",&openPcapDialouge,ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
             ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::InputText("File Path", buffer, MAX_PATH);
+            ImGui::InputText("Select File", buffer, MAX_PATH);
             ImGui::SameLine();
             if (ImGui::Button("Open") || btnPressAuto) {
                 struct stat s;
@@ -84,7 +83,6 @@ void doStuff(GLFWwindow* window) {
             fb.Display();
             if (fb.HasSelected()) {
                 strcpy_s(buffer, fb.GetSelected().string().c_str());
-                btnPressAuto = true;
             }
 
 
