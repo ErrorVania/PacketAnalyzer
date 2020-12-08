@@ -36,7 +36,7 @@ void doStuff(GLFWwindow* window) {
 
     char buffer[MAX_PATH];
     memset(buffer, 0, MAX_PATH);
-    strcpy_s(buffer, "C:\\Users\\Joshua\\Desktop");
+    //strcpy_s(buffer, "");
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
