@@ -75,6 +75,9 @@
     <ClInclude Include="include\imgui\imfilebrowser.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="pcapreader\protocols.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
