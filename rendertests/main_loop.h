@@ -260,32 +260,36 @@ public:
 
 
                 if (ImGui::BeginTable("Data", columns.size(), ImGuiTableFlags_::ImGuiTableFlags_Borders | ImGuiTableFlags_::ImGuiTableFlags_Resizable)) {
+
                     for (const char* _a : columns) {
                         ImGui::TableSetupColumn(_a);
                     }
 
 
                     ImGui::TableHeadersRow();
-                    for (unsigned i = 0; i < pdus.size(); i++) {
-                        if (ImGui::TableNextColumn()) {
-                            ImGui::Text("%d", i);
+                    ImGuiListClipper clipper(pdus.size(),ImGui::GetTextLineHeightWithSpacing());
+                    while (clipper.Step()) {
+                        for (unsigned i = clipper.DisplayStart; i < pdus.size() && i < clipper.DisplayEnd; i++) {
+                            if (ImGui::TableNextColumn()) {
+                                ImGui::Text("%d", i);
+                            }
+                            if (ImGui::TableNextColumn()) {
+                                ImGui::Text("%.3fs", pdus[i]->ts_usec / 1000000.0f);
+                            }
+                            if (ImGui::TableNextColumn()) {
+                                ImGui::Text("%s", getSource(pdus[i]).c_str());
+                            }
+                            if (ImGui::TableNextColumn()) {
+                                ImGui::Text("%s", getDest(pdus[i]).c_str());
+                            }
+                            if (ImGui::TableNextColumn()) {
+                                ImGui::Text("%s", lastProtoL2(pdus[i]).c_str());
+                            }
+                            if (ImGui::TableNextColumn()) {
+                                ImGui::Text("%d", pdus[i]->incl_len);
+                            }
+                            ImGui::TableNextRow();
                         }
-                        if (ImGui::TableNextColumn()) {
-                            ImGui::Text("%.3fs", pdus[i]->ts_usec / 1000000.0f);
-                        }
-                        if (ImGui::TableNextColumn()) {
-                            ImGui::Text("%s", getSource(pdus[i]).c_str());
-                        }
-                        if (ImGui::TableNextColumn()) {
-                            ImGui::Text("%s", getDest(pdus[i]).c_str());
-                        }
-                        if (ImGui::TableNextColumn()) {
-                            ImGui::Text("%s", lastProtoL2(pdus[i]).c_str());
-                        }
-                        if (ImGui::TableNextColumn()) {
-                            ImGui::Text("%d", pdus[i]->incl_len);
-                        }
-                        ImGui::TableNextRow();
                     }
                     ImGui::EndTable();
                 }
