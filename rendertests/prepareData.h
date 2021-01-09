@@ -78,7 +78,6 @@ std::string getDest(const pcap_pak_hdr* pcaphdr) {
 
 struct TableEntry {
     std::string timestr, src, dst;
-    unsigned incl_len;
     std::vector<std::string> protos;
 };
 
@@ -103,7 +102,6 @@ const std::vector<TableEntry> digest(const std::vector<pcap_pak_hdr*>& pdus) {
 			te.src = getSource(pcaphdr);
 			te.dst = getDest(pcaphdr);
 		}
-        te.incl_len = pcaphdr->incl_len;
 
         //Unravel protocol stack
         {

@@ -73,7 +73,6 @@ public:
             ImGui::NewFrame();
 
 
-            ImGui::ShowDemoWindow();
 
             //-------------------------------------------------------------------------------------------------------
             if (openPcapDialouge) {
@@ -164,7 +163,7 @@ public:
                                 ImGui::Text("%s", te->protos.back().c_str());
                             }
                             if (ImGui::TableNextColumn()) {
-                                ImGui::Text("%d", te->incl_len);
+                                ImGui::Text("%d", pdus[i]->incl_len);
                             }
                             ImGui::TableNextRow();
                         }
