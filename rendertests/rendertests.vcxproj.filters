@@ -63,9 +63,6 @@
     <ClInclude Include="main_loop.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="pcapreader\reader_struct.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="extractPDUinfo.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -76,6 +73,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="pcapreader\protocols.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="prepareData.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
