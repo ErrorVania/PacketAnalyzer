@@ -5,7 +5,6 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
-#include "extractPDUinfo.h"
 #include "prepareData.h"
 #include <imgui/imfilebrowser.h>
 
@@ -48,6 +47,21 @@ public:
             delete x;*/
     }
 
+
+
+    void testthread() {
+        pcapreader.open(buffer);
+        global_hdr = pcapreader.getGHDR();
+        if (global_hdr != nullptr && global_hdr->magic == 0xA1B2C3D4) {
+            pcapreader.beginRead(&pdus);
+            pdus_digested = digest(pdus);
+            pcapLoaded = true;
+        }
+        else {
+            pcapLoaded = false;
+            MessageBoxA(NULL, "Invalid file Format or wrong endianness!", "PCAP Error", MB_OK);
+        }
+    }
 
     void doLoop(GLFWwindow* window) {
         while (!glfwWindowShouldClose(window))
@@ -115,7 +129,6 @@ public:
             //-------------------------------------------------------------------------------------------------------
 
 
-            static Resolver res;
 
             if (pcapLoaded && showtest) {
                 ImGui::SetNextWindowPos(ImVec2(fileselectorwindowsize.x, 0));
@@ -134,7 +147,7 @@ public:
                     ImGuiListClipper clipper(pdus.size(),ImGui::GetTextLineHeightWithSpacing());
                     while (clipper.Step()) {
                         for (unsigned i = clipper.DisplayStart; i < pdus_digested.size() && i < clipper.DisplayEnd; i++) {
-                            static TableEntry* te = &pdus_digested[i];
+                            TableEntry* te = &pdus_digested[i];
                             if (ImGui::TableNextColumn()) {
                                 ImGui::Text("%d", i);
                             }
@@ -148,7 +161,7 @@ public:
                                 ImGui::Text("%s", te->dst.c_str());
                             }
                             if (ImGui::TableNextColumn()) {
-                                ImGui::Text("%s", te->protos.back());
+                                ImGui::Text("%s", te->protos.back().c_str());
                             }
                             if (ImGui::TableNextColumn()) {
                                 ImGui::Text("%d", te->incl_len);

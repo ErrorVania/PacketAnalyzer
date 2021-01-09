@@ -62,17 +62,3 @@ void protosL2(std::map<uint16_t,std::string>& m) {
 	m[0xF1C1] = "Redundancy Tag";
 
 }
-
-class Resolver {
-public:
-	std::map<uint16_t, std::string>* L2;
-
-	Resolver() {
-		L2 = new std::map<uint16_t, std::string>;
-		protosL2(*L2);
-	}
-	~Resolver() {
-		delete L2;
-	}
-
-};

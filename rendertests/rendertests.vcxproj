@@ -166,7 +166,6 @@
     <ClInclude Include="pcapreader\pcapreader.h" />
     <ClInclude Include="pcapreader\protocols.h" />
     <ClInclude Include="pcapreader\structs.h" />
-    <ClInclude Include="extractPDUinfo.h" />
     <ClInclude Include="prepareData.h" />
     <ClInclude Include="protoResolv.h" />
   </ItemGroup>

@@ -63,9 +63,6 @@
     <ClInclude Include="main_loop.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="extractPDUinfo.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="protoResolv.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>

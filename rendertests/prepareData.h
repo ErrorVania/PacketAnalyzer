@@ -6,14 +6,8 @@
 #include "pcapreader/structs.h"
 #include "pcapreader/pcapreader.h"
 #include "protoResolv.h"
-#include "extractPDUinfo.h"
 
 
-struct TableEntry {
-	std::string timestr, src, dst;
-	unsigned incl_len;
-    std::vector<const char*> protos;
-};
 
 std::string tomac(uint8_t* mac) {
     std::stringstream b;
@@ -24,8 +18,6 @@ std::string tomac(uint8_t* mac) {
     return b.str();
 
 }
-
-
 std::string toip(const in_addr* ip) {
     char str[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, ip, str, INET_ADDRSTRLEN);
@@ -36,8 +28,6 @@ std::string toip6(const in6_addr* ip) {
     inet_ntop(AF_INET6, ip, str, INET6_ADDRSTRLEN);
     return std::string(str);
 }
-
-
 std::string getSource(const pcap_pak_hdr* pcaphdr) {
 
     const uint8_t* payload = pcaphdr->pdu;
@@ -85,6 +75,11 @@ std::string getDest(const pcap_pak_hdr* pcaphdr) {
 }
 
 
+struct TableEntry {
+    std::string timestr, src, dst;
+    unsigned incl_len;
+    std::vector<std::string> protos;
+};
 
 const std::vector<TableEntry> digest(const std::vector<pcap_pak_hdr*>& pdus) {
 	std::cout << "Preparing to digest..." << std::endl;
@@ -109,7 +104,6 @@ const std::vector<TableEntry> digest(const std::vector<pcap_pak_hdr*>& pdus) {
 		}
         te.incl_len = pcaphdr->incl_len;
 
-
         //Unravel protocol stack
         {
             std::map<uint16_t, std::string> x;
@@ -117,7 +111,7 @@ const std::vector<TableEntry> digest(const std::vector<pcap_pak_hdr*>& pdus) {
             protosL2(x);
             te.protos.push_back("EtherII");
             if (e->ethertype >= 1536) {
-                te.protos.push_back(x[e->ethertype].c_str());
+                te.protos.push_back(x[e->ethertype]);
 
 
 
