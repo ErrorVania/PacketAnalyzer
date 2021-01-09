@@ -2,14 +2,15 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <WS2tcpip.h>
 #include <map>
 #include "pcapreader/structs.h"
 #include "pcapreader/pcapreader.h"
 #include "protoResolv.h"
+#include "extractPDUinfo.h"
+
 
 struct TableEntry {
-	char* timestr, *src, *dst;
+	std::string timestr, src, dst;
 	unsigned incl_len;
     std::vector<const char*> protos;
 };
@@ -25,15 +26,72 @@ std::string tomac(uint8_t* mac) {
 }
 
 
+std::string toip(const in_addr* ip) {
+    char str[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, ip, str, INET_ADDRSTRLEN);
+    return std::string(str);
+}
+std::string toip6(const in6_addr* ip) {
+    char str[INET6_ADDRSTRLEN];
+    inet_ntop(AF_INET6, ip, str, INET6_ADDRSTRLEN);
+    return std::string(str);
+}
+
+
+std::string getSource(const pcap_pak_hdr* pcaphdr) {
+
+    const uint8_t* payload = pcaphdr->pdu;
+
+    eth_hdr* e = (eth_hdr*)payload;
+    ip_hdr* ip4 = (ip_hdr*)&e->payload;
+    ip6_hdr* ip6 = (ip6_hdr*)&e->payload;
+    auto ethtype = ntohs(e->ethertype);
+
+    switch (ethtype) {
+    case 0x0800: //IPv4
+        return toip(&ip4->src);
+        break;
+
+    case 0x86DD: //IPv6
+        return toip6(&ip6->src);
+        break;
+
+    default:
+        return tomac(e->smac);
+        break;
+    }
+}
+std::string getDest(const pcap_pak_hdr* pcaphdr) {
+    const uint8_t* payload = pcaphdr->pdu;
+
+    eth_hdr* e = (eth_hdr*)payload;
+    ip_hdr* ip4 = (ip_hdr*)&e->payload;
+    ip6_hdr* ip6 = (ip6_hdr*)&e->payload;
+    auto ethtype = ntohs(e->ethertype);
+
+    switch (ethtype) {
+    case 0x0800: //IPv4
+        return toip(&ip4->dst);
+        break;
+
+    case 0x86DD: //IPv6
+        return toip6(&ip6->dst);
+        break;
+
+    default:
+        return tomac(e->dmac);
+        break;
+    }
+}
+
 
 
 const std::vector<TableEntry> digest(const std::vector<pcap_pak_hdr*>& pdus) {
 	std::cout << "Preparing to digest..." << std::endl;
 	std::vector<TableEntry> r;
 
-	TableEntry te;
 	for (pcap_pak_hdr* pcaphdr : pdus) {
-
+        TableEntry te;
 		//get time
 		{
 			time_t nowtime = ((timeval*)pcaphdr)->tv_sec;
@@ -46,44 +104,8 @@ const std::vector<TableEntry> digest(const std::vector<pcap_pak_hdr*>& pdus) {
 
 		//get route
 		{
-            const uint8_t* payload = pcaphdr->pdu;
-
-            eth_hdr* e = (eth_hdr*)payload;
-            ip_hdr* ip4 = (ip_hdr*)&e->payload;
-            ip6_hdr* ip6 = (ip6_hdr*)&e->payload;
-            auto ethtype = ntohs(e->ethertype);
-
-            char src[INET6_ADDRSTRLEN];
-            char dst[INET6_ADDRSTRLEN];
-
-            switch (ethtype) {
-            case 0x0800: //IPv4
-                //char src[INET_ADDRSTRLEN];
-                //char dst[INET_ADDRSTRLEN];
-                inet_ntop(AF_INET, ip4, src, INET6_ADDRSTRLEN);
-                inet_ntop(AF_INET, ip4, dst, INET6_ADDRSTRLEN);
-
-                te.src = src;
-                te.dst = dst;
-
-                break;
-
-            case 0x86DD: //IPv6
-                //char src[INET6_ADDRSTRLEN];
-                //char dst[INET6_ADDRSTRLEN];
-                inet_ntop(AF_INET6, ip6, src, INET6_ADDRSTRLEN);
-                inet_ntop(AF_INET6, ip6, dst, INET6_ADDRSTRLEN);
-
-                te.src = src;
-                te.dst = dst;
-
-                break;
-
-            default:
-                te.src = (char*)tomac(e->smac).c_str();
-                te.dst = (char*)tomac(e->dmac).c_str();
-                break;
-            }
+			te.src = getSource(pcaphdr);
+			te.dst = getDest(pcaphdr);
 		}
         te.incl_len = pcaphdr->incl_len;
 
@@ -105,15 +127,14 @@ const std::vector<TableEntry> digest(const std::vector<pcap_pak_hdr*>& pdus) {
 
 
 
-
+        r.push_back(te);
 	}
 
 
 
 
 
-
-
+    std::cout << r.size() << std::endl;
 
 
 

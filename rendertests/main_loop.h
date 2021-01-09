@@ -133,26 +133,25 @@ public:
                     ImGui::TableHeadersRow();
                     ImGuiListClipper clipper(pdus.size(),ImGui::GetTextLineHeightWithSpacing());
                     while (clipper.Step()) {
-                        for (unsigned i = clipper.DisplayStart; i < pdus.size() && i < clipper.DisplayEnd; i++) {
+                        for (unsigned i = clipper.DisplayStart; i < pdus_digested.size() && i < clipper.DisplayEnd; i++) {
+                            static TableEntry* te = &pdus_digested[i];
                             if (ImGui::TableNextColumn()) {
                                 ImGui::Text("%d", i);
                             }
                             if (ImGui::TableNextColumn()) {
-                                //ImGui::Text("%.3fs", pdus[i]->ts_usec / 1000000.0f);
-                                //ImGui::Text("%d", getTimestamp(pdus[i]));
-                                ImGui::Text("%d.%ds", pdus[i]->ts_sec, pdus[i]->ts_usec);
+                                ImGui::Text("%s", te->timestr.c_str());
                             }
                             if (ImGui::TableNextColumn()) {
-                                ImGui::Text("%s", getSource(pdus[i]).c_str());
+                                ImGui::Text("%s", te->src.c_str());
                             }
                             if (ImGui::TableNextColumn()) {
-                                ImGui::Text("%s", getDest(pdus[i]).c_str());
+                                ImGui::Text("%s", te->dst.c_str());
                             }
                             if (ImGui::TableNextColumn()) {
-                                ImGui::Text("%s", lastProtoL2(pdus[i]).c_str());
+                                ImGui::Text("%s", te->protos.back());
                             }
                             if (ImGui::TableNextColumn()) {
-                                ImGui::Text("%d", pdus[i]->incl_len);
+                                ImGui::Text("%d", te->incl_len);
                             }
                             ImGui::TableNextRow();
                         }
