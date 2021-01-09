@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <iomanip>
 #include "pcapreader/structs.h"
 #include "pcapreader/pcapreader.h"
 #include "protoResolv.h"
@@ -107,14 +108,60 @@ const std::vector<TableEntry> digest(const std::vector<pcap_pak_hdr*>& pdus) {
         //Unravel protocol stack
         {
             std::map<uint16_t, std::string> x;
-            eth_hdr* e = (eth_hdr*)pcaphdr->pdu;
             protosL2(x);
+            eth_hdr* e = (eth_hdr*)&pcaphdr->pdu;
+            uint16_t ethertype = ntohs(e->ethertype);
             te.protos.push_back("EtherII");
-            if (e->ethertype >= 1536) {
-                te.protos.push_back(x[e->ethertype]);
 
+            bool dobreak = false;
 
+            if (ethertype >= 1536) {
+                te.protos.push_back(x[ethertype]);
+                switch (ethertype) {
+                case 0x0800: //IPv4
+                    //What proto does IPv4 carry?
+                    {
+                        ip_hdr* ip = (ip_hdr*)&e->payload;
+                        uint8_t ipproto = ip->proto;
+                        switch (ipproto) {
+                        case IPPROTO_TCP:
+                            te.protos.push_back("TCP");
+                            break;
+                        
+                        case IPPROTO_UDP:
+                            te.protos.push_back("UDP");
+                            break;
+                        }
+                    }
+                    break;
 
+                case 0x86DD: //IPv6
+                    {
+                        ip6_hdr* ip6 = (ip6_hdr*)&e->payload;
+                        uint8_t ipproto = ip6->next_header;
+                        switch (ipproto) {
+                        case IPPROTO_TCP:
+                            te.protos.push_back("TCP");
+                            break;
+
+                        case IPPROTO_UDP:
+                            te.protos.push_back("UDPs");
+                            break;
+                        }
+                    }
+                break;
+
+                default:
+                    std::stringstream b;
+                    b << "0x" << std::hex << ethertype;
+                    te.protos.push_back(b.str());
+                    break;
+                }
+            }
+            else {
+                std::stringstream b;
+                b << "0x" << std::hex << ethertype;
+                te.protos.push_back(b.str());
             }
         }
 
